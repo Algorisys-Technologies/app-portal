@@ -27,35 +27,49 @@ const Home = () => {
   const { applications, searchTerm } = useLoaderData();
 
   return (
-    <div>
-      <h1>Applications</h1>
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-6">Applications</h1>
 
       {/* Search Bar */}
-      <Form method="get">
+      <Form method="get" className="mb-6 flex items-center">
         <input
           type="text"
           name="search"
           placeholder="Search applications..."
           defaultValue={searchTerm}
+          className="flex-grow p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500"
         />
-        <button type="submit">Search</button>
+        <button
+          type="submit"
+          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+        >
+          Search
+        </button>
       </Form>
 
       {/* Application Cards */}
-      <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {applications.map((app: any) => (
-          <div key={app.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '5px' }}>
-            <h2>{app.name}</h2>
-            <p>{app.description}</p>
-            <p>{app.url}</p>
+          <div
+            key={app.id}
+            className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+          >
+            <h2 className="text-xl font-semibold mb-2">{app.name}</h2>
+            <p className="text-gray-600 mb-2">{app.description}</p>
+            <p className="text-blue-500 truncate">{app.url}</p>
           </div>
         ))}
       </div>
 
       {/* Manage Applications Button */}
-      <div style={{ marginTop: '2rem' }}>
+      <div className="mt-8">
         <Link to="/manage-apps">
-          <button type="button">Manage Applications</button>
+          <button
+            type="button"
+            className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75"
+          >
+            Manage Applications
+          </button>
         </Link>
       </div>
     </div>

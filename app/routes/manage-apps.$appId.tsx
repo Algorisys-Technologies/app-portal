@@ -48,31 +48,51 @@ const EditApp = () => {
   };
 
   return (
-    <div style={{ marginTop: '2rem' }}>
-      <h2>Edit Application</h2>
-      <Form method="post" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Application Name"
-          required
-          defaultValue={application?.name || ''}
-        />
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          defaultValue={application?.description || ''}
-        />
-        <input
-          type="text"
-          name="url"
-          placeholder="URL"
-          required
-          defaultValue={application?.url || ''}
-        />
+    <div className="mt-8 max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold mb-4">Edit Application</h2>
+      <Form method="post" onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Application Name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Application Name"
+            required
+            defaultValue={application?.name || ''}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+          <input
+            type="text"
+            name="description"
+            id="description"
+            placeholder="Description"
+            defaultValue={application?.description || ''}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="url" className="block text-sm font-medium text-gray-700">URL</label>
+          <input
+            type="text"
+            name="url"
+            id="url"
+            placeholder="URL"
+            required
+            defaultValue={application?.url || ''}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
         <input type="hidden" name="_action" value="update" />
-        <button type="submit">Edit Application</button>
+        <button
+          type="submit"
+          className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Edit Application
+        </button>
       </Form>
     </div>
   );
