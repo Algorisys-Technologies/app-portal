@@ -1,15 +1,18 @@
 import { ActionFunction, LoaderFunction, json, redirect } from '@remix-run/node';
-import { useLoaderData, Form, Link } from '@remix-run/react';
+import { useLoaderData, Form, Link, useActionData, useSubmit, Outlet } from '@remix-run/react';
 import { prisma } from '../utils/prisma.server';
+import { useRef } from 'react';
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ params }) => {
+
+  const isEdit = params.appId || null
   const applications = await prisma.application.findMany({
     orderBy: {
       createdAt: 'desc',
     },
   });
 
-  return json({ applications });
+  return json({ applications, isEdit });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -20,24 +23,51 @@ export const action: ActionFunction = async ({ request }) => {
   const description = formData.get('description') as string;
   const url = formData.get('url') as string;
 
-  if (actionType === 'delete') {
-    await prisma.application.delete({ where: { id: appId } });
-  } else if (actionType === 'update') {
-    await prisma.application.update({
-      where: { id: appId },
-      data: { name, description, url },
-    });
-  } else if (actionType === 'create') {
-    await prisma.application.create({
-      data: { name, description, url, orgId: 'clzmdxj3e000012ebfjzj3sol' },
-    });
+  switch (actionType) {
+
+    case 'delete': {
+      await prisma.application.delete({ where: { id: appId } });
+    }
+    case 'update': {
+      await prisma.application.update({
+        where: { id: appId },
+        data: { name, description, url },
+      });
+    }
+
+    case 'create': {
+      await prisma.application.create({
+        data: { name, description, url, orgId: 'clzmdxj3e000012ebfjzj3sol' },
+      });
+    }
+    case 'redirect-to-edit': {
+      return redirect(`/manage-apps/${appId}`)
+    }
+
   }
+
+
 
   return redirect('/manage-apps');
 };
 
 const ManageApps = () => {
-  const { applications } = useLoaderData();
+  const { applications, isEdit } = useLoaderData();
+  const addFormRef = useRef(null)
+  const actionData = useActionData()
+  const submit = useSubmit()
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    let formData = new FormData(e.currentTarget);
+
+    let data = Object.fromEntries(formData);
+    console.log(data)
+    e.currentTarget.reset();
+    submit({ ...data }, { method: "POST", navigate: false })
+
+
+  }
 
   return (
     <div>
@@ -53,24 +83,36 @@ const ManageApps = () => {
             <Form method="post">
               <input type="hidden" name="appId" value={app.id} />
               <button type="submit" name="_action" value="delete">Delete</button>
-              <Link to={`/edit-app/${app.id}`}>
-                <button type="button">Edit</button>
-              </Link>
+
             </Form>
+
+            <Form method="post">
+              <input type="hidden" name="appId" value={app.id} />
+              <button type="submit" name="_action" value="redirect-to-edit">Edit</button>
+             
+
+            </Form>
+
+
           </div>
         ))}
       </div>
 
       {/* Add New Application Form */}
-      <div style={{ marginTop: '2rem' }}>
-        <h2>Add New Application</h2>
-        <Form method="post">
-          <input type="text" name="name" placeholder="Application Name" required />
-          <input type="text" name="description" placeholder="Description" />
-          <input type="text" name="url" placeholder="URL" required />
-          <button type="submit" name="_action" value="create">Add Application</button>
-        </Form>
-      </div>
+
+      {!isEdit && (
+        <div style={{ marginTop: '2rem' }}>
+          <h2>Add New Application</h2>
+          <Form method="post" onSubmit={handleSubmit}>
+            <input type="text" name="name" placeholder="Application Name" required />
+            <input type="text" name="description" placeholder="Description" />
+            <input type="text" name="url" placeholder="URL" required />
+            <input type="hidden" name="_action" value="create" />
+            <button type="submit">Add Application</button>
+          </Form>
+        </div>)}
+
+      <Outlet />
     </div>
   );
 };
