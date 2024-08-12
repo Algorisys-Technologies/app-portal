@@ -8,46 +8,46 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  name       String?
-  orgs       UserOrg[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  orgs      UserOrg[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Organization {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
   applications Application[]
-  users       UserOrg[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  users        UserOrg[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model UserOrg {
-  id            String   @id @default(cuid())
-  userId        String
+  id             String   @id @default(cuid())
+  userId         String
   organizationId String
-  role          String   
-  createdAt     DateTime @default(now())
-  
-  user          User      @relation(fields: [userId], references: [id])
-  organization  Organization @relation(fields: [organizationId], references: [id])
+  role           String
+  createdAt      DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
 
   @@unique([userId, organizationId])
 }
 
 model Application {
-  id            String   @id @default(cuid())
-  orgId         String
-  name          String
-  description   String?
-  imageUrl      String?
-  url           String 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  description String?
+  imageUrl    String?
+  url         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  organization  Organization @relation(fields: [orgId], references: [id])
+  organization Organization @relation(fields: [orgId], references: [id])
 }

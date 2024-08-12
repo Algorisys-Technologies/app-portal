@@ -1,27 +1,25 @@
-import { useLoaderData, Form, Link } from '@remix-run/react';
-import { json } from '@remix-run/node';
-import { prisma } from '../utils/prisma.server';
+import { useLoaderData, Form, Link } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { prisma } from "../utils/prisma.server";
 
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
-  const searchTerm = url.searchParams.get('search') || '';
+  const searchTerm = url.searchParams.get("search") || "";
 
   const applications = await prisma.application.findMany({
     where: {
       name: {
         contains: searchTerm,
-        mode: 'insensitive',
+        mode: "insensitive",
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
   });
 
   return json({ applications, searchTerm });
 };
-
-// Action function removed as CRUD operations are no longer needed
 
 const Home = () => {
   const { applications, searchTerm } = useLoaderData();

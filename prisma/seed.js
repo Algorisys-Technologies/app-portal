@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -6,48 +6,42 @@ async function main() {
   // Create organizations
   const org1 = await prisma.organization.create({
     data: {
-      name: 'Algorisys',
-      description: 'A technology company',
+      name: "Algorisys",
+      description: "A technology company",
       applications: {
         create: [
           {
-            name: 'App One',
-            description: 'First application',
-            url: 'https://appone.techcorp.com',
-            imageUrl: 'https://example.com/appone.png',
+            name: "App One",
+            description: "First application",
+            url: "https://appone.techcorp.com",
+            imageUrl: "https://example.com/appone.png",
           },
           {
-            name: 'App Two',
-            description: 'Second application',
-            url: 'https://apptwo.techcorp.com',
-            imageUrl: 'https://example.com/apptwo.png',
+            name: "App Two",
+            description: "Second application",
+            url: "https://apptwo.techcorp.com",
+            imageUrl: "https://example.com/apptwo.png",
           },
         ],
       },
     },
   });
 
- 
-
   // Create users
   const user1 = await prisma.user.create({
     data: {
-      email: 'alice@example.com',
-      name: 'Alice',
+      email: "alice@example.com",
+      name: "Alice",
       orgs: {
         create: {
           organizationId: org1.id,
-          role: 'Admin',
+          role: "Admin",
         },
       },
     },
   });
 
- 
-
-
-
-  console.log({ user1});
+  console.log({ user1 });
 }
 
 main()
