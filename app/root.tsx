@@ -6,6 +6,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import "./tailwind.css";
+import { Toaster } from "react-hot-toast";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+      <div>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              success: {
+                theme: {
+                  primary: "#4aed88",
+                },
+              },
+            }}
+          ></Toaster>
+        </div>
         {children}
         <ScrollRestoration />
         <Scripts />

@@ -47,11 +47,20 @@ const Home = () => {
 
       {/* Application Cards */}
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {applications.map((app: any) => (
+        {applications.map((app) => (
           <div
             key={app.id}
             className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
           >
+            <img
+              src={
+                app.imageUrl
+                  ? `/uploads/${app.id}/${app.imageUrl}`
+                  : "/default-image.jpg"
+              }
+              alt={app.name}
+              className="w-full h-40 object-cover rounded-lg mb-4"
+            />
             <h2 className="text-xl font-semibold mb-2">{app.name}</h2>
             <p className="text-gray-600 mb-2">{app.description}</p>
             <p className="text-blue-500 truncate">{app.url}</p>
