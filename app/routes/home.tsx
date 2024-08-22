@@ -1,8 +1,19 @@
+// app/routes/home.tsx
+
 import { useLoaderData, Form, Link } from "@remix-run/react";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { prisma } from "../utils/prisma.server";
+import { getSession } from "~/utils/session.server";
 
 export const loader = async ({ request }) => {
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  // If not logged in, redirect to login
+  if (!session.has("token")) {
+    return redirect("/login");
+  }
+
   const url = new URL(request.url);
   const searchTerm = url.searchParams.get("search") || "";
 
@@ -26,6 +37,15 @@ const Home = () => {
 
   return (
     <div className="p-8">
+      {/* Logout Button */}
+      <Form action="/logout" method="post">
+        <button
+          type="submit"
+          className="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75"
+        >
+          Logout
+        </button>
+      </Form>
       <h1 className="text-3xl font-bold mb-6">Applications</h1>
 
       {/* Search Bar */}
@@ -69,7 +89,7 @@ const Home = () => {
       </div>
 
       {/* Manage Applications Button */}
-      <div className="mt-8">
+      <div className="mt-8 flex justify-between">
         <Link to="/manage-apps">
           <button
             type="button"

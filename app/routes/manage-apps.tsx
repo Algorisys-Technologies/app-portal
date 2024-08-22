@@ -20,11 +20,18 @@ import { prisma } from "../utils/prisma.server";
 import { useEffect, useRef, useState } from "react";
 import path from "path";
 import fs from "fs";
+import { getSession } from "~/utils/session.server";
 
 const getImageUploadPath = (appId: string) =>
   path.join(process.cwd(), "public", "uploads", appId);
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  if (!session.has("token")) {
+    return redirect("/login");
+  }
   const isEdit = params.appId || null;
   const applications = await prisma.application.findMany({
     orderBy: {
