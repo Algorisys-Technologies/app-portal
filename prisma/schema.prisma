@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Organization {
+    id         Int       @id @default(autoincrement())
+    org_name   String
+    first_name String
+    last_name  String
+    email      String    @unique
+    admin      Boolean   @default(false)
+    org_size   Int?
+    usage      String?
+    users      User[]
+    licenses   License[]
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+}
+
+model User {
+    id                 Int          @id @default(autoincrement())
+    name               String       @unique
+    password           String
+    role_id            Int
+    isActive           Boolean      @default(true)
+    refreshToken       String?
+    refreshTokenExpiry DateTime?
+    resetToken         String? // Optional field for reset token
+    resetTokenExpiry   DateTime? // Optional field for reset token expiry
+    org_id             Int
+    org                Organization @relation(fields: [org_id], references: [id])
+    createdAt          DateTime     @default(now())
+    updatedAt          DateTime     @updatedAt
+}
+
+model Application {
+    id          Int       @id @default(autoincrement())
+    app_name    String
+    description String?
+    licenses    License[]
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+}
+
+model License {
+    id             Int            @id @default(autoincrement())
+    org_id         Int
+    org            Organization   @relation(fields: [org_id], references: [id])
+    app_id         Int
+    app            Application    @relation(fields: [app_id], references: [id])
+    license_type   String // E.g., 'user', 'transaction', 'storage', etc.
+    total_licenses Int // Total number of licenses granted
+    used_licenses  Int            @default(0) // Number of licenses currently used
+    start_date     DateTime
+    end_date       DateTime
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    usage_logs     LicenseUsage[] // Relation to track individual usage events
+}
+
+model LicenseUsage {
+    id         Int      @id @default(autoincrement())
+    license_id Int
+    license    License  @relation(fields: [license_id], references: [id])
+    user_id    Int? // Optional, if usage is tied to a specific user
+    action     String // E.g., 'enroll', 'consume', 'revoke'
+    createdAt  DateTime @default(now())
+}
