@@ -1,4 +1,4 @@
-import { api, APIError, Header } from "encore.dev/api";
+import { api, Header } from "encore.dev/api";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
@@ -48,29 +48,27 @@ function generateRefreshToken(user: {
 }
 
 // Middleware for request validation
-const validateLoginRequest = (request: { body: LoginRequest }) => {
-  const { email, password, org_id } = request.body;
+const validateLoginRequest = (request: LoginRequest) => {
+  const { email, password, org_id } = request;
 
   if (!email || !password || !org_id) {
-    throw APIError.invalidArgument(
-      "Missing required fields: email, password, or org_id."
-    );
+    throw new Error("Missing required fields: email, password, or org_id.");
   }
 };
 
 // Login API endpoint
-export const login = api(
+export const login = api<LoginRequest, LoginResponse>(
   {
     method: "POST",
     path: "/api/login",
     expose: true,
   },
-  async (request: { body: LoginRequest }): Promise<LoginResponse> => {
+  async (request): Promise<LoginResponse> => {
     try {
       // Validate request
       validateLoginRequest(request);
 
-      const { email, password, org_id } = request.body;
+      const { email, password, org_id } = request;
 
       // Fetch user from the database
       const user = await prismaClient.user.findFirst({
@@ -81,15 +79,13 @@ export const login = api(
       });
 
       if (!user) {
-        throw APIError.notFound(
-          "User not found with the given email and organization ID."
-        );
+        throw new Error("User not found with the given email and organization ID.");
       }
 
       // Validate the password
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
-        throw APIError.unauthenticated("Invalid email or password.");
+        throw new Error("Invalid email or password.");
       }
 
       // Generate tokens
@@ -102,20 +98,12 @@ export const login = api(
         refreshToken: refreshToken,
         message: "Login successful.",
       };
-    } catch (error: unknown) {
-      if (error instanceof APIError) {
-        console.error("API error during login:", error.message);
-        return { success: false, message: error.message };
-      } else if (error instanceof Error) {
-        console.error("Error during login:", error.message);
-        return { success: false, message: "An error occurred during login." };
-      } else {
-        console.error("Unknown error:", error);
-        return {
-          success: false,
-          message: "An unknown error occurred during login.",
-        };
-      }
+    } catch (error) {
+      console.error("Login error:", error.message);
+      return {
+        success: false,
+        message: error.message || "An unknown error occurred during login.",
+      };
     }
   }
 );

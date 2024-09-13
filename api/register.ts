@@ -20,19 +20,10 @@ interface RegisterResponse {
 }
 
 // Function to validate registration request
-const validateRegisterRequest = (request: { body: RegisterRequest }) => {
-  const { org_name, first_name, last_name, email, password, org_size, usage } =
-    request.body;
+const validateRegisterRequest = (request: RegisterRequest) => {
+  const { org_name, first_name, last_name, email, password, org_size, usage } = request;
 
-  if (
-    !org_name ||
-    !first_name ||
-    !last_name ||
-    !email ||
-    !password ||
-    org_size === undefined ||
-    !usage
-  ) {
+  if (!org_name || !first_name || !last_name || !email || !password || org_size === undefined || !usage) {
     throw APIError.invalidArgument("Missing required fields.");
   }
 
@@ -40,26 +31,18 @@ const validateRegisterRequest = (request: { body: RegisterRequest }) => {
 };
 
 // Register API endpoint
-export const register = api(
+export const register = api<RegisterRequest, RegisterResponse>(
   {
     method: "POST",
     path: "/api/register",
     expose: true,
   },
-  async (request: { body: RegisterRequest }): Promise<RegisterResponse> => {
+  async (request): Promise<RegisterResponse> => {
     try {
       // Validate request
       validateRegisterRequest(request);
 
-      const {
-        org_name,
-        first_name,
-        last_name,
-        email,
-        password,
-        org_size,
-        usage,
-      } = request.body;
+      const { org_name, first_name, last_name, email, password, org_size, usage } = request;
 
       // Hash the password before saving it
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -96,16 +79,10 @@ export const register = api(
           stack: error.stack,
           name: error.name,
         });
-        return {
-          success: false,
-          message: "An error occurred during registration.",
-        };
+        return { success: false, message: "An error occurred during registration." };
       } else {
         console.error("Unknown error:", error);
-        return {
-          success: false,
-          message: "An unknown error occurred during registration.",
-        };
+        return { success: false, message: "An unknown error occurred during registration." };
       }
     }
   }
